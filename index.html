@@ -522,19 +522,36 @@ function showResults(){
   go('s4','s3');
 }
 
+const IS_FREE = new URLSearchParams(window.location.search).get('free') === 'true';
+
 function handlePay(){
+  if(IS_FREE){
+    go('s5','s4');
+    return;
+  }
   const PAYMENT_URL='https://talwaredge.gumroad.com/l/jfhrc';
   window.open(PAYMENT_URL,'_blank');
-  // go('s5','s4') is called after payment confirmation
-  // For now also show unlocked state so user can see what they're buying:
   go('s5','s4');
 }
+
+// If free mode, update pay button text and note
+window.addEventListener('DOMContentLoaded', function(){
+  if(IS_FREE){
+    const pb=document.getElementById('pay-btn');
+    if(pb){
+      pb.textContent='View Full Report — Free';
+      pb.style.background='#854F0B';
+    }
+    const pn=document.querySelector('.pay-note');
+    if(pn) pn.textContent='Free access · Feedback welcome';
+  }
+});
 
 function restartApp(){
   answers=new Array(28).fill(null);current=0;mobility='';
   document.getElementById('elder-name').value='';
   document.querySelectorAll('.pill,.mobility-card').forEach(el=>el.classList.remove('selected'));
-  go('s1','s5');
+  go('s1',document.getElementById('s5').classList.contains('active')?'s5':'s4');
 }
 </script>
 </body>
