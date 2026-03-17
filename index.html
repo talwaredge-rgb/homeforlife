@@ -5,6 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Home Safety Assessment — HomeForLife</title>
 <meta name="description" content="A free OT-informed, room-by-room home safety assessment to identify fall risks for older adults. Get a personalized report with recommendations and cost estimates."/>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0BTMY84WD6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0BTMY84WD6');
+  function trackEvent(name, params){
+    if(typeof gtag==='function') gtag('event', name, params||{});
+  }
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -267,7 +278,7 @@ h1{font-size:26px;font-weight:400;text-align:center;line-height:1.2}
   <div class="cta-dark">
     <h2 id="cta-headline"></h2>
     <p>Our occupational therapists will visit, assess in person, and design modifications that are safe, dignified, and beautifully considered.</p>
-    <div class="cta-dark-btn" onclick="window.open('mailto:hello@homeforlife.com','_blank')">BOOK A FREE CONSULTATION</div>
+    <div class="cta-dark-btn" onclick="trackEvent('consultation_clicked',{country:country,free_mode:IS_FREE});window.open('mailto:hello@homeforlife.com','_blank')">BOOK A FREE CONSULTATION</div>
   </div>
   <button class="new-assess" onclick="restartApp()">START NEW ASSESSMENT</button>
 </div>
@@ -324,11 +335,13 @@ function goToS2(){
   const rel=document.querySelector('#rel-group .pill.selected');
   relationship=rel?rel.textContent:'Family';
   document.getElementById('about-heading').textContent='About '+name;
+  trackEvent('assessment_started', {country: country, free_mode: IS_FREE});
   go('s2','s1');
 }
 function beginAssessment(){
   if(!mobility){alert('Please select a mobility level.');return;}
   conditions=[...document.querySelectorAll('#cond-group .pill.selected')].map(p=>p.textContent);
+  trackEvent('assessment_begun', {mobility: mobility, conditions: conditions.join(','), free_mode: IS_FREE});
   buildRoomTabs();renderQ();go('s3','s2');
 }
 
@@ -434,7 +447,7 @@ function renderQ(){
     ${current>0?'<div class="prev-link" onclick="prevQ()">&#8592; Previous question</div>':''}
   `;
 }
-function answer(val){answers[current]=val;if(current<27){current++;renderQ();}else showResults();}
+function answer(val){answers[current]=val;if(current<27){current++;renderQ();}else{trackEvent('assessment_completed',{country:country,free_mode:IS_FREE});showResults();}}
 function prevQ(){if(current>0){current--;renderQ();}}
 
 function showResults(){
@@ -519,18 +532,23 @@ function showResults(){
     <div class="invest-card green"><div class="invest-lbl green">ESSENTIALS</div><div class="invest-val">${costStr}</div></div>
     <div class="invest-card amber"><div class="invest-lbl amber">COMPLETE</div><div class="invest-val">${completeMin}–${completeMax}</div></div>`;
   document.getElementById('cta-headline').textContent="Make "+elderName+"'s home safer — beautifully";
+  trackEvent('report_viewed', {risk_level: riskLbl, no_count: noCount, safe_pct: safePct, country: country, free_mode: IS_FREE});
   go('s4','s3');
 }
 
 const IS_FREE = new URLSearchParams(window.location.search).get('free') === 'true';
+if(IS_FREE) trackEvent('free_mode_used', {source: document.referrer||'direct'});
 
 function handlePay(){
   if(IS_FREE){
+    trackEvent('full_report_unlocked', {method: 'free', country: country});
     go('s5','s4');
     return;
   }
+  trackEvent('payment_clicked', {country: country, price: 9});
   const PAYMENT_URL='https://talwaredge.gumroad.com/l/jfhrc';
   window.open(PAYMENT_URL,'_blank');
+  trackEvent('full_report_unlocked', {method: 'paid', country: country});
   go('s5','s4');
 }
 
