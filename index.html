@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Home Safety Assessment — HomeForLife</title>
+<meta name="description" content="A free OT-informed, room-by-room home safety assessment to identify fall risks for older adults. Get a personalized report with recommendations and cost estimates."/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Georgia,serif;background:#f7f5f0;color:#2c2c2a;min-height:100vh}
+.wrap{max-width:600px;margin:0 auto;padding:2rem 1rem 4rem}
+.screen{display:none}.screen.active{display:block}
+h1{font-size:26px;font-weight:400;text-align:center;line-height:1.2}
+.gold{color:#8B6914}
+.sub{font-size:14px;color:#6b6b60;text-align:center;margin-top:8px;line-height:1.6}
+.stats{display:flex;justify-content:center;gap:2rem;margin:1.5rem 0 2rem;border-top:0.5px solid #d8d4c8;border-bottom:0.5px solid #d8d4c8;padding:1rem 0}
+.stat-val{font-size:22px;font-weight:500;text-align:center}
+.stat-lbl{font-size:10px;letter-spacing:0.1em;color:#8b8b7a;text-align:center;margin-top:2px;font-family:sans-serif}
+.field-lbl{font-size:11px;letter-spacing:0.08em;font-family:sans-serif;font-weight:500;color:#5a5a4a;margin-bottom:8px}
+.text-input{width:100%;padding:11px 14px;border:1px solid #d8d4c8;border-radius:8px;font-size:15px;font-family:Georgia,serif;background:#fff;outline:none;margin-bottom:1.5rem}
+.text-input:focus{border-color:#8B6914}
+.pill-group{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.5rem}
+.pill{padding:8px 14px;border-radius:100px;font-size:13px;font-family:sans-serif;cursor:pointer;background:#fff;border:1px solid #d8d4c8;transition:all 0.15s}
+.pill:hover{border-color:#8B6914}
+.pill.selected{background:#1a1a18;color:#fff;border-color:#1a1a18}
+.pill-wide{flex:1;min-width:calc(50% - 4px);text-align:center;padding:11px 12px}
+.country-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.5rem}
+.country-btn{padding:10px 12px;border:1px solid #d8d4c8;border-radius:8px;font-size:13px;font-family:sans-serif;cursor:pointer;background:#fff;text-align:center;transition:all 0.15s}
+.country-btn:hover{border-color:#8B6914}
+.country-btn.selected{background:#1a1a18;color:#fff;border-color:#1a1a18}
+.cta-btn{width:100%;padding:15px;background:#1a1a18;color:#fff;border:none;border-radius:8px;font-size:13px;letter-spacing:0.08em;cursor:pointer;font-family:sans-serif;font-weight:500;margin-top:0.75rem}
+.cta-btn:hover{background:#333}
+.back-link{display:block;text-align:center;margin-top:1rem;font-size:13px;font-family:sans-serif;color:#8b8b7a;cursor:pointer}
+.back-link:hover{color:#2c2c2a}
+.divider{border:none;border-top:0.5px solid #d8d4c8;margin:1.5rem 0}
+.mobility-card{border:1px solid #d8d4c8;border-radius:8px;padding:12px 14px;margin-bottom:8px;cursor:pointer;background:#fff;display:flex;align-items:center;gap:12px;transition:all 0.15s}
+.mobility-card:hover{border-color:#8B6914}
+.mobility-card.selected{border-color:#1a1a18;background:#f5f5f0}
+.mob-icon{font-size:18px;width:26px;text-align:center}
+.mob-title{font-size:14px;font-weight:500;color:#2c2c2a}
+.mob-sub{font-size:12px;color:#6b6b60;margin-top:2px;font-family:sans-serif}
+.progress-row{display:flex;justify-content:space-between;align-items:center;font-family:sans-serif;font-size:12px;color:#8b8b7a;margin-bottom:8px}
+.prog-bar{height:3px;background:#e8e4dc;border-radius:2px;margin-bottom:1.5rem}
+.prog-fill{height:3px;background:#3B6D11;border-radius:2px;transition:width 0.3s}
+.room-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem}
+.room-tab{padding:5px 11px;border-radius:100px;font-size:11px;font-family:sans-serif;border:1px solid #d8d4c8;background:#fff;color:#8b8b7a;white-space:nowrap}
+.room-tab.active-tab{background:#1a1a18;color:#fff;border-color:#1a1a18}
+.room-tab.done-tab{color:#6b6b60}
+.room-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:#f0ede6;border-radius:100px;font-size:12px;font-family:sans-serif;color:#6b6b60;margin-bottom:10px}
+.room-hint{font-style:italic;font-size:13px;color:#8b8b7a;margin-bottom:10px;line-height:1.5}
+.q-text{font-size:20px;line-height:1.35;margin-bottom:8px;font-weight:400}
+.q-hint{font-size:12px;color:#8b8b7a;line-height:1.5;margin-bottom:1.25rem;font-family:sans-serif}
+.q-hint::before{content:'💡 '}
+.ans-row{display:flex;gap:8px;margin-bottom:1.25rem}
+.ans-btn{flex:1;padding:13px 6px;border-radius:8px;font-size:13px;font-family:sans-serif;cursor:pointer;transition:all 0.15s;text-align:center;border:1.5px solid}
+.ans-yes{border-color:#3B6D11;background:#EAF3DE;color:#27500A}
+.ans-yes:hover,.ans-yes.sel{background:#c0dd97;border-color:#27500A}
+.ans-no{border-color:#A32D2D;background:#FCEBEB;color:#501313}
+.ans-no:hover,.ans-no.sel{background:#f7c1c1;border-color:#501313}
+.ans-ns{border-color:#854F0B;background:#FAEEDA;color:#412402}
+.ans-ns:hover,.ans-ns.sel{background:#FAC775;border-color:#412402}
+.prev-link{font-size:13px;font-family:sans-serif;color:#8b8b7a;cursor:pointer}
+.prev-link:hover{color:#2c2c2a}
+.report-header{text-align:center;padding-bottom:1.25rem;border-bottom:0.5px solid #d8d4c8;margin-bottom:1.25rem}
+.report-name{font-size:24px;margin-bottom:5px}
+.report-meta{font-size:12px;font-family:sans-serif;color:#8b8b7a}
+.score-circle{width:110px;height:110px;border-radius:50%;border:2px solid #A32D2D;background:#FCEBEB;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:1.25rem auto}
+.score-num{font-size:38px;font-weight:400}
+.score-lbl{font-size:9px;letter-spacing:0.1em;font-family:sans-serif;margin-top:-2px}
+.stats3{display:flex;justify-content:center;gap:1.5rem;margin:1.25rem 0;text-align:center}
+.s3val{font-size:20px;font-weight:500}
+.s3lbl{font-size:9px;letter-spacing:0.08em;font-family:sans-serif;color:#8b8b7a;margin-top:2px}
+.pers-box{background:#f0ede6;border-radius:8px;padding:10px 14px;font-size:12px;font-family:sans-serif;line-height:1.5;margin-bottom:1.25rem}
+.section-head{font-size:17px;margin-bottom:4px}
+.section-sub{font-size:12px;font-family:sans-serif;color:#8b8b7a;margin-bottom:1rem}
+.quick-item{background:#f7f5f0;border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;font-family:sans-serif;font-size:13px}
+.quick-cost{font-size:12px;color:#8b8b7a;white-space:nowrap}
+.locked-wrap{position:relative;border:0.5px solid #d8d4c8;border-radius:12px;overflow:hidden;margin-bottom:1.25rem}
+.locked-inner{padding:1.25rem;filter:blur(5px);pointer-events:none;user-select:none}
+.lock-overlay{position:absolute;inset:0;background:rgba(247,245,240,0.65);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1rem}
+.lock-icon{font-size:26px;margin-bottom:6px}
+.lock-title{font-size:15px;font-weight:500;margin-bottom:4px}
+.lock-sub{font-size:12px;font-family:sans-serif;color:#6b6b60}
+.pay-btn{width:100%;padding:15px;background:#3B6D11;border:none;border-radius:8px;color:#fff;font-size:15px;font-family:sans-serif;font-weight:500;cursor:pointer;margin-bottom:8px}
+.pay-btn:hover{background:#27500A}
+.pay-note{text-align:center;font-size:12px;font-family:sans-serif;color:#8b8b7a;margin-bottom:1.5rem}
+.room-card{border:0.5px solid #d8d4c8;border-radius:10px;overflow:hidden;margin-bottom:1rem}
+.room-header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#fff}
+.room-header-left{display:flex;align-items:center;gap:8px;font-size:15px}
+.room-pct{font-family:sans-serif;font-size:13px;font-weight:500}
+.room-bar{height:3px;background:#e8e4dc}
+.room-bar-fill{height:3px;transition:width 0.3s}
+.room-items{padding:10px}
+.rec-card{border:0.5px solid #d8d4c8;border-radius:8px;padding:11px 12px;margin-bottom:8px;background:#fff;position:relative}
+.badge{display:inline-block;padding:2px 9px;border-radius:100px;font-size:10px;font-family:sans-serif;font-weight:600;letter-spacing:0.04em;margin-bottom:7px}
+.badge-crit{background:#701F1F;color:#FAEEDA}
+.badge-high{background:#854F0B;color:#FAEEDA}
+.badge-rec{background:#3B6D11;color:#EAF3DE}
+.rec-cost{position:absolute;top:11px;right:12px;font-size:12px;font-family:sans-serif;color:#8b8b7a}
+.rec-title{font-size:14px;margin-bottom:5px}
+.rec-desc{font-size:12px;font-family:sans-serif;color:#6b6b60;line-height:1.5;margin-bottom:8px}
+.rec-links{display:flex;gap:8px;flex-wrap:wrap}
+.rec-link{font-size:11px;font-family:sans-serif;padding:4px 10px;border:1px solid #d8d4c8;border-radius:100px;color:#854F0B;text-decoration:none;background:#fff}
+.rec-link:hover{background:#FAEEDA}
+.invest-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem}
+.invest-card{border-radius:8px;padding:14px}
+.invest-card.green{background:#EAF3DE}
+.invest-card.amber{background:#FAEEDA}
+.invest-lbl{font-size:9px;letter-spacing:0.1em;font-family:sans-serif;font-weight:600;margin-bottom:6px}
+.invest-lbl.green{color:#3B6D11}
+.invest-lbl.amber{color:#854F0B}
+.invest-val{font-size:18px;font-weight:500}
+.cta-dark{background:#1a1a18;border-radius:10px;padding:1.5rem;text-align:center;margin-bottom:1rem}
+.cta-dark h2{color:#fff;font-size:18px;margin-bottom:6px}
+.cta-dark p{color:#a0a08a;font-size:13px;font-family:sans-serif;line-height:1.6;margin-bottom:1.25rem}
+.cta-dark-btn{display:inline-block;padding:12px 28px;border:1.5px solid #fff;border-radius:8px;color:#fff;font-size:12px;letter-spacing:0.08em;font-family:sans-serif;cursor:pointer;background:transparent}
+.new-assess{width:100%;padding:13px;border:1.5px solid #2c2c2a;border-radius:8px;background:transparent;font-size:12px;letter-spacing:0.08em;font-family:sans-serif;cursor:pointer;margin-top:8px}
+.site-footer{text-align:center;font-size:11px;font-family:sans-serif;color:#b0b0a0;padding:2rem 0 1rem;border-top:0.5px solid #d8d4c8;margin-top:2rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- S1: Intake -->
+<div class="screen active" id="s1">
+  <div style="text-align:center;font-size:30px;margin-bottom:10px">🏡</div>
+  <h1>Home Safety<br><span class="gold">Assessment</span></h1>
+  <p class="sub">An OT-informed, room-by-room evaluation to identify fall risks and recommend modifications — personalized to your loved one's needs.</p>
+  <div class="stats">
+    <div><div class="stat-val">5</div><div class="stat-lbl">ROOM AREAS</div></div>
+    <div><div class="stat-val">28</div><div class="stat-lbl">SAFETY CHECKS</div></div>
+    <div><div class="stat-val">5</div><div class="stat-lbl">MINUTES</div></div>
+  </div>
+  <hr class="divider">
+  <div class="field-lbl">YOUR COUNTRY</div>
+  <div class="country-grid">
+    <div class="country-btn selected" onclick="selectCountry(this,'us')">🇺🇸 United States</div>
+    <div class="country-btn" onclick="selectCountry(this,'uk')">🇬🇧 United Kingdom</div>
+    <div class="country-btn" onclick="selectCountry(this,'au')">🇦🇺 Australia</div>
+    <div class="country-btn" onclick="selectCountry(this,'eu')">🇪🇺 Europe</div>
+  </div>
+  <div class="field-lbl">ELDER'S FIRST NAME</div>
+  <input class="text-input" id="elder-name" placeholder="e.g. Mom, Dad, Robert…"/>
+  <div class="field-lbl">YOUR RELATIONSHIP</div>
+  <div class="pill-group" id="rel-group">
+    <div class="pill" onclick="togglePill(this,'rel')">Son</div>
+    <div class="pill" onclick="togglePill(this,'rel')">Daughter</div>
+    <div class="pill" onclick="togglePill(this,'rel')">Spouse</div>
+    <div class="pill" onclick="togglePill(this,'rel')">Grandchild</div>
+    <div class="pill" onclick="togglePill(this,'rel')">Caregiver</div>
+    <div class="pill" onclick="togglePill(this,'rel')">OT / Professional</div>
+    <div class="pill" onclick="togglePill(this,'rel')">Other</div>
+  </div>
+  <div class="field-lbl">HOW ARE YOU ASSESSING?</div>
+  <div class="pill-group" id="assess-group">
+    <div class="pill pill-wide" onclick="togglePill(this,'assess')">🏠 In the home</div>
+    <div class="pill pill-wide" onclick="togglePill(this,'assess')">📱 From memory / video call</div>
+  </div>
+  <div class="field-lbl">DOES THE HOME HAVE STAIRS?</div>
+  <div class="pill-group" id="stairs-group">
+    <div class="pill pill-wide" onclick="togglePill(this,'stairs')">Yes</div>
+    <div class="pill pill-wide" onclick="togglePill(this,'stairs')">No</div>
+  </div>
+  <button class="cta-btn" onclick="goToS2()">CONTINUE →</button>
+</div>
+
+<!-- S2: About elder -->
+<div class="screen" id="s2">
+  <h1 id="about-heading">About your loved one</h1>
+  <p class="sub">This helps us weight the assessment to their specific situation.</p>
+  <hr class="divider">
+  <div class="field-lbl">MOBILITY LEVEL</div>
+  <div id="mob-group">
+    <div class="mobility-card" onclick="selectMob(this,'independent')"><div class="mob-icon">🚶</div><div><div class="mob-title">Fully Independent</div><div class="mob-sub">Walks unaided, no balance concerns</div></div></div>
+    <div class="mobility-card" onclick="selectMob(this,'some')"><div class="mob-icon">↗</div><div><div class="mob-title">Some Difficulty</div><div class="mob-sub">Occasional unsteadiness, uses furniture for support</div></div></div>
+    <div class="mobility-card" onclick="selectMob(this,'aid')"><div class="mob-icon">🦯</div><div><div class="mob-title">Uses Walking Aid</div><div class="mob-sub">Cane, walker, or wheelchair for longer distances</div></div></div>
+    <div class="mobility-card" onclick="selectMob(this,'assist')"><div class="mob-icon">🤝</div><div><div class="mob-title">Needs Assistance</div><div class="mob-sub">Requires another person's help to move safely</div></div></div>
+  </div>
+  <hr class="divider">
+  <div class="field-lbl">ANY EXISTING CONDITIONS? <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px">(select all that apply)</span></div>
+  <div class="pill-group" id="cond-group">
+    <div class="pill" onclick="toggleMulti(this)">Arthritis / Joint Pain</div>
+    <div class="pill" onclick="toggleMulti(this)">Low Vision</div>
+    <div class="pill" onclick="toggleMulti(this)">Recent / Upcoming Surgery</div>
+    <div class="pill" onclick="toggleMulti(this)">Memory Concerns</div>
+    <div class="pill" onclick="toggleMulti(this)">History of Falls</div>
+    <div class="pill" onclick="toggleMulti(this)">Continence Issues</div>
+    <div class="pill" onclick="toggleMulti(this)">None of the above</div>
+  </div>
+  <button class="cta-btn" onclick="beginAssessment()">BEGIN ASSESSMENT →</button>
+  <span class="back-link" onclick="go('s1','s2')">← Back</span>
+</div>
+
+<!-- S3: Questions -->
+<div class="screen" id="s3">
+  <div class="progress-row"><span id="q-label">Question 1 of 28</span><span id="q-pct">0%</span></div>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="room-tabs" id="room-tabs"></div>
+  <div id="q-area"></div>
+</div>
+
+<!-- S4: Locked results -->
+<div class="screen" id="s4">
+  <div class="report-header">
+    <div class="report-name" id="r-name"></div>
+    <div class="report-meta" id="r-meta"></div>
+  </div>
+  <div class="score-circle" id="r-circle">
+    <div class="score-num" id="r-score"></div>
+    <div class="score-lbl" id="r-risk-lbl"></div>
+  </div>
+  <div class="stats3">
+    <div><div class="s3val" id="r-crit"></div><div class="s3lbl">CRITICAL FIXES</div></div>
+    <div><div class="s3val" id="r-recs"></div><div class="s3lbl">RECOMMENDATIONS</div></div>
+    <div><div class="s3val" id="r-cost"></div><div class="s3lbl">ESSENTIALS COST</div></div>
+  </div>
+  <div class="pers-box" id="r-personal"></div>
+  <hr class="divider">
+  <div class="section-head">⚡ Quick wins — do these first</div>
+  <div class="section-sub">High-impact, low-cost fixes you can action this weekend.</div>
+  <div id="r-quick"></div>
+  <hr class="divider">
+  <div class="locked-wrap">
+    <div class="locked-inner">
+      <div style="font-size:17px;margin-bottom:1rem">Room-by-room breakdown</div>
+      <div style="height:55px;background:#e8e4dc;border-radius:8px;margin-bottom:8px;opacity:.6"></div>
+      <div style="height:55px;background:#e8e4dc;border-radius:8px;margin-bottom:8px;opacity:.5"></div>
+      <div style="height:55px;background:#e8e4dc;border-radius:8px;margin-bottom:8px;opacity:.4"></div>
+      <div style="height:55px;background:#e8e4dc;border-radius:8px;margin-bottom:8px;opacity:.3"></div>
+      <div style="height:55px;background:#e8e4dc;border-radius:8px;opacity:.2"></div>
+    </div>
+    <div class="lock-overlay">
+      <div class="lock-icon">🔒</div>
+      <div class="lock-title">Your full report is ready</div>
+      <div class="lock-sub">Unlock to see all flagged risks, room-by-room recommendations, cost estimates, and product links</div>
+    </div>
+  </div>
+  <button class="pay-btn" id="pay-btn" onclick="handlePay()">Unlock Full Report — $9</button>
+  <div class="pay-note">One-time payment &nbsp;·&nbsp; Instant access &nbsp;·&nbsp; Printable PDF</div>
+</div>
+
+<!-- S5: Unlocked -->
+<div class="screen" id="s5">
+  <div class="report-header">
+    <div class="report-name" id="r2-name"></div>
+    <div class="report-meta" id="r2-meta"></div>
+  </div>
+  <div class="score-circle" id="r2-circle">
+    <div class="score-num" id="r2-score"></div>
+    <div class="score-lbl" id="r2-risk"></div>
+  </div>
+  <div class="stats3">
+    <div><div class="s3val" id="r2-crit"></div><div class="s3lbl">CRITICAL FIXES</div></div>
+    <div><div class="s3val" id="r2-recs"></div><div class="s3lbl">RECOMMENDATIONS</div></div>
+    <div><div class="s3val" id="r2-cost"></div><div class="s3lbl">ESSENTIALS COST</div></div>
+  </div>
+  <div class="pers-box" id="r2-personal"></div>
+  <hr class="divider">
+  <div class="section-head">⚡ Quick wins — do these first</div>
+  <div class="section-sub">High-impact, low-cost fixes you can action this weekend.</div>
+  <div id="r2-quick"></div>
+  <hr class="divider">
+  <div class="section-head" style="margin-bottom:1.25rem">Room-by-room breakdown</div>
+  <div id="r2-rooms"></div>
+  <div class="invest-grid" id="r2-invest"></div>
+  <div class="cta-dark">
+    <h2 id="cta-headline"></h2>
+    <p>Our occupational therapists will visit, assess in person, and design modifications that are safe, dignified, and beautifully considered.</p>
+    <div class="cta-dark-btn" onclick="window.open('mailto:hello@homeforlife.com','_blank')">BOOK A FREE CONSULTATION</div>
+  </div>
+  <button class="new-assess" onclick="restartApp()">START NEW ASSESSMENT</button>
+</div>
+
+<div class="site-footer">
+  &copy; 2026 HomeForLife &nbsp;·&nbsp; OT-informed home safety for aging in place
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+const COUNTRIES={
+  us:{sym:'$',name:'US',meas:'36"',store:'Home Depot',storeUrl:'https://www.homedepot.com/s/',mult:1},
+  uk:{sym:'£',name:'UK',meas:'90cm',store:'B&Q',storeUrl:'https://www.diy.com/search?term=',mult:0.79},
+  au:{sym:'A$',name:'AU',meas:'90cm',store:'Bunnings',storeUrl:'https://www.bunnings.com.au/search/products?q=',mult:1.52},
+  eu:{sym:'€',name:'EU',meas:'90cm',store:'Amazon',storeUrl:'https://www.amazon.de/s?k=',mult:0.92}
+};
+
+let country='us',elderName='',relationship='',mobility='',conditions=[];
+let answers=new Array(28).fill(null),current=0;
+
+function selectCountry(el,code){
+  document.querySelectorAll('.country-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');country=code;
+  const pb=document.getElementById('pay-btn');
+  if(pb)pb.textContent='Unlock Full Report — '+COUNTRIES[code].sym+'9';
+}
+function go(show,hide){
+  document.getElementById(hide).classList.remove('active');
+  document.getElementById(show).classList.add('active');
+  window.scrollTo(0,0);
+}
+function togglePill(el,group){
+  document.querySelectorAll('#'+group+'-group .pill').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function toggleMulti(el){
+  if(el.textContent==='None of the above'){
+    document.querySelectorAll('#cond-group .pill').forEach(p=>p.classList.remove('selected'));
+    el.classList.add('selected');
+  } else {
+    document.querySelector('#cond-group .pill:last-child').classList.remove('selected');
+    el.classList.toggle('selected');
+  }
+}
+function selectMob(el,val){
+  document.querySelectorAll('#mob-group .mobility-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');mobility=val;
+}
+function goToS2(){
+  const name=document.getElementById('elder-name').value.trim();
+  if(!name){alert('Please enter a name to personalize the report.');return;}
+  elderName=name;
+  const rel=document.querySelector('#rel-group .pill.selected');
+  relationship=rel?rel.textContent:'Family';
+  document.getElementById('about-heading').textContent='About '+name;
+  go('s2','s1');
+}
+function beginAssessment(){
+  if(!mobility){alert('Please select a mobility level.');return;}
+  conditions=[...document.querySelectorAll('#cond-group .pill.selected')].map(p=>p.textContent);
+  buildRoomTabs();renderQ();go('s3','s2');
+}
+
+const ROOMS=[
+  {name:'Bathroom',icon:'🚿',hint:'The #1 location for falls — 80% of senior injuries happen here',count:7},
+  {name:'Bedroom',icon:'🛏',hint:'Where most nighttime falls begin — the bed-to-bathroom journey is critical',count:5},
+  {name:'Kitchen',icon:'🔍',hint:'Burns, reaching injuries, and appliance hazards — the most under-assessed room',count:5},
+  {name:'Living Areas',icon:'🛋',hint:'Where tripping hazards hide in plain sight — and where they spend the most time',count:5},
+  {name:'Entrance & Stairs',icon:'🚪',hint:'Stairway falls cause the most serious injuries — entrances set the tone for safety',count:6}
+];
+const QUESTIONS=[
+  {room:0,q:'Are grab bars installed near the toilet?',hint:'Toilet transfers are the single highest-risk moment. A grab bar reduces fall risk by up to 40%.'},
+  {room:0,q:'Are there grab bars or a sturdy handle in the shower or bathtub area?',hint:'Wet surfaces + standing with eyes closed while washing hair = peak fall risk.'},
+  {room:0,q:'Is the shower or tub floor non-slip (textured tiles, anti-skid mat, or coating)?',hint:'A wet, smooth surface is the most common fall trigger. Anti-slip treatment is the #1 quick fix.'},
+  {room:0,q:'Can they shower without stepping over a high ledge or into a tub?',hint:'Stepping over a bathtub edge or high threshold is a major fall trigger, especially post-surgery.'},
+  {room:0,q:'Is the toilet at a comfortable height (not too low to stand up from)?',hint:'Standard toilets can be too low for seniors. A comfort-height seat or raised toilet seat reduces knee strain significantly.'},
+  {room:0,q:'Is there automatic or easy-to-reach lighting for nighttime bathroom visits?',hint:'Most nighttime falls happen on the path to or inside the bathroom in darkness.'},
+  {room:0,q:'Can the bathroom door be opened from outside in an emergency?',hint:'A locked bathroom with no external release is one of the most dangerous situations in an elderly home.'},
+  {room:1,q:'Is the bed at a height where their feet touch the floor flat when sitting on the edge?',hint:'Bed too high = dangling feet, unstable dismount. Too low = difficult to stand. Ideal: knee at 90° when seated.'},
+  {room:1,q:'Is the path from bed to bathroom completely clear and obstacle-free?',hint:'The bed-to-bathroom path is the #1 nighttime fall zone. Rugs, cords, and furniture edges are all hazards.'},
+  {room:1,q:'Can they turn on a light without getting out of bed?',hint:'Getting out of bed in darkness to reach a switch is a common fall trigger, especially with low blood pressure on standing.'},
+  {room:1,q:'Is the floor non-slip (no loose rugs, polished surfaces, or unsecured mats)?',hint:'Loose rugs are the #1 tripping hazard in the home. Even decorative rugs are dangerous without anti-slip backing.'},
+  {room:1,q:'Is a phone or emergency alert device within reach from the bed?',hint:'A fall at night with no way to call for help can turn a minor injury into a life-threatening situation.'},
+  {room:2,q:'Are everyday items (utensils, dishes, pantry staples) stored between waist and shoulder height?',hint:'Reaching overhead or bending to floor-level storage causes loss of balance and strains joints.'},
+  {room:2,q:'Is the stove or cooktop equipped with an auto-shutoff, timer, or burner alarm?',hint:'Unattended cooking is the leading cause of home fires for seniors. Auto-shutoff devices eliminate this risk.'},
+  {room:2,q:'Is the kitchen floor dry, non-slip, and free of loose mats?',hint:'Water splashes from the sink + loose mats = a dangerous combination, especially when carrying hot items.'},
+  {room:2,q:'Are taps and handles easy to grip (lever-type, not round knobs)?',hint:'Round knobs require 5x more grip strength than lever handles — critical for arthritic hands.'},
+  {room:2,q:'Is the countertop area well-lit for food preparation (no shadowy work zones)?',hint:'Poor task lighting leads to cuts, burns, and missed spills. Under-cabinet lighting solves this instantly.'},
+  {room:3,q:function(){return'Are walkways at least '+COUNTRIES[country].meas+' wide and free of cords, clutter, and protruding furniture?'},hint:'Clear wide pathways let walkers and wheelchairs pass safely and reduce trip hazards dramatically.'},
+  {room:3,q:'Are all rugs removed or firmly secured with non-slip backing?',hint:'Loose rugs cause 38% of home trip-and-fall injuries. Best practice: remove them entirely.'},
+  {room:3,q:'Is there a firm, high-seated chair with armrests for easy sit-to-stand?',hint:'Low sofas without armrests are extremely difficult for seniors. A chair with armrests at the right height is ideal.'},
+  {room:3,q:'Are floor transitions (tile to wood, room thresholds) smooth and level?',hint:'Even a small threshold lip is a trip hazard. Beveled transitions or threshold ramps eliminate this.'},
+  {room:3,q:'Are light switches accessible at every room entrance?',hint:'Walking into dark rooms is a common fall trigger. Two-way switches or motion sensors solve this.'},
+  {room:4,q:'Are there sturdy handrails on both sides of all staircases?',hint:'Dual handrails reduce stair falls by up to 60%. Single-side is not enough for seniors with balance issues.'},
+  {room:4,q:'Are stair edges clearly visible (contrast strips, different-color nosing)?',hint:'Contrast nosing on step edges is mandatory in aged-care facilities globally. A simple, high-impact fix.'},
+  {room:4,q:'Is stairway and corridor lighting bright, consistent, and glare-free?',hint:'Inconsistent lighting causes depth-perception errors. Warm 3000–3500K LEDs at high CRI are ideal.'},
+  {room:4,q:'Can they enter and exit the home without navigating steps (or is there a ramp)?',hint:'A single step at the entrance becomes impassable after hip or knee surgery. Ramp slope must be gentle.'},
+  {room:4,q:'Are door handles lever-type throughout (not round knobs)?',hint:'Lever handles require minimal grip strength — critical for arthritis and post-stroke recovery.'},
+  {room:4,q:'Is the main door fitted with a peephole, video doorbell, or intercom?',hint:'Seniors are vulnerable to doorstep scams. Visual identification without opening adds safety and confidence.'}
+];
+const BASE_RECS={
+  0:[
+    {badge:'crit',title:'Grab Bar Installation',desc:'L-shaped bar near toilet + angled bar in shower zone. Anchored into wall studs — not suction-mounted.',baseMin:150,baseMax:400,qi:0,search:'grab bar bathroom elderly'},
+    {badge:'crit',title:'Anti-Slip Floor Treatment',desc:'Micro-texture coating applied to existing tiles — invisible finish that dramatically improves wet grip. No tile replacement needed.',baseMin:100,baseMax:280,qi:2,search:'anti slip bath mat non slip coating'},
+    {badge:'high',title:'Accessible Shower Conversion',desc:'Zero-threshold shower entry eliminates the bathtub step-over — the single highest-impact modification for post-surgery recovery.',baseMin:600,baseMax:3000,qi:3,search:'walk in shower conversion zero threshold'},
+    {badge:'high',title:'Emergency Door Release',desc:'Privacy lock with external emergency release — allows family to open the door if someone falls inside.',baseMin:60,baseMax:180,qi:6,search:'bathroom privacy lock emergency release'}
+  ],
+  1:[
+    {badge:'high',title:'Bedside & Path Lighting',desc:'Touch-activated bedside lamp + motion-sensor path lighting to bathroom. Warm amber tone preserves night vision.',baseMin:40,baseMax:160,qi:9,search:'motion sensor night light bedroom path'},
+    {badge:'high',title:'Secure Bedroom Flooring',desc:'Remove all loose rugs; add anti-slip treatment to hard floors. If rugs are desired, use only certified anti-slip backed rugs.',baseMin:40,baseMax:200,qi:10,search:'non slip rug pad anti slip mat'}
+  ],
+  2:[
+    {badge:'crit',title:'Stove Safety Device',desc:'Auto-shutoff knob covers or induction cooktop with auto-off timer. The most important kitchen safety upgrade for seniors.',baseMin:80,baseMax:500,qi:13,search:'stove auto shutoff senior safety knob'},
+    {badge:'rec',title:'Ergonomic Kitchen Storage',desc:'Reorganize items to waist-to-shoulder height. Pull-down shelf inserts and D-pull handles replace round knobs.',baseMin:150,baseMax:600,qi:12,search:'pull down cabinet shelf insert kitchen'}
+  ],
+  3:[
+    {badge:'high',title:'Walkway Optimization',desc:'Ensure clear pathways throughout. Cord management, furniture repositioning, and removal of all trip hazards.',baseMin:40,baseMax:150,qi:17,search:'cord management cable tidy floor safety'},
+    {badge:'high',title:'Floor Transition Strips',desc:'Smooth all transitions between rooms. Beveled threshold ramps eliminate even small lip hazards.',baseMin:30,baseMax:120,qi:20,search:'threshold ramp floor transition strip'}
+  ],
+  4:[
+    {badge:'high',title:'Stair Edge Contrast Strips',desc:'High-visibility nosing on every step edge. Mandatory in care facilities worldwide — subtle finishes available.',baseMin:60,baseMax:200,qi:23,search:'stair nosing contrast strip non slip'},
+    {badge:'high',title:'Entrance Ramp',desc:'Step-free entrance with gentle ramp and handrail. Essential for walkers, wheelchairs, and post-surgery recovery.',baseMin:400,baseMax:2000,qi:25,search:'wheelchair ramp portable entrance ramp'}
+  ]
+};
+
+function fmt(mn,mx){
+  const c=COUNTRIES[country];
+  return c.sym+Math.round(mn*c.mult/10)*10+'–'+c.sym+Math.round(mx*c.mult/10)*10;
+}
+function buildRoomTabs(){
+  const tabs=document.getElementById('room-tabs');tabs.innerHTML='';
+  ROOMS.forEach((r,i)=>{
+    const d=document.createElement('div');
+    d.className='room-tab'+(i===0?' active-tab':'');
+    d.id='tab-'+i;d.textContent=r.icon+' '+r.name;tabs.appendChild(d);
+  });
+}
+function getRoomIdx(qi){let c=0;for(let i=0;i<ROOMS.length;i++){c+=ROOMS[i].count;if(qi<c)return i;}return ROOMS.length-1;}
+function getQInRoom(qi){let c=0;for(let i=0;i<ROOMS.length;i++){if(qi<c+ROOMS[i].count)return qi-c;c+=ROOMS[i].count;}return 0;}
+function renderQ(){
+  const qo=QUESTIONS[current];
+  const qtext=typeof qo.q==='function'?qo.q():qo.q;
+  const ri=getRoomIdx(current),qin=getQInRoom(current)+1,r=ROOMS[ri];
+  document.getElementById('q-label').textContent='Question '+(current+1)+' of 28';
+  const pct=Math.round((current/28)*100);
+  document.getElementById('q-pct').textContent=pct+'%';
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.querySelectorAll('.room-tab').forEach((t,i)=>{
+    t.className='room-tab'+(i===ri?' active-tab':(i<ri?' done-tab':''));
+    t.textContent=(i<ri?'✓ ':ROOMS[i].icon+' ')+ROOMS[i].name;
+  });
+  const sel=answers[current];
+  document.getElementById('q-area').innerHTML=`
+    <div class="room-badge">${r.icon} ${r.name} &middot; ${qin}/${r.count}</div>
+    <div class="room-hint">${r.hint}</div>
+    <div class="q-text">${qtext}</div>
+    <div class="q-hint">${qo.hint}</div>
+    <div class="ans-row">
+      <div class="ans-btn ans-yes${sel==='yes'?' sel':''}" onclick="answer('yes')">&#10003; Yes</div>
+      <div class="ans-btn ans-no${sel==='no'?' sel':''}" onclick="answer('no')">&#10005; No</div>
+      <div class="ans-btn ans-ns${sel==='ns'?' sel':''}" onclick="answer('ns')">? Not Sure</div>
+    </div>
+    ${current>0?'<div class="prev-link" onclick="prevQ()">&#8592; Previous question</div>':''}
+  `;
+}
+function answer(val){answers[current]=val;if(current<27){current++;renderQ();}else showResults();}
+function prevQ(){if(current>0){current--;renderQ();}}
+
+function showResults(){
+  const noIdx=answers.map((a,i)=>a==='no'?i:-1).filter(i=>i>=0);
+  const noCount=noIdx.length;
+  const ansCount=answers.filter(a=>a==='yes'||a==='no').length;
+  const yesCount=answers.filter(a=>a==='yes').length;
+  const safePct=ansCount>0?Math.round((yesCount/ansCount)*100):100;
+  const riskLbl=noCount>=10?'HIGH RISK':noCount>=5?'MODERATE RISK':'LOWER RISK';
+  const circleColor=noCount>=10?'#A32D2D':noCount>=5?'#854F0B':'#3B6D11';
+  const circleBg=noCount>=10?'#FCEBEB':noCount>=5?'#FAEEDA':'#EAF3DE';
+  const c=COUNTRIES[country];
+
+  const allRecs=[];
+  Object.keys(BASE_RECS).forEach(ri=>{
+    BASE_RECS[ri].forEach(rec=>{if(noIdx.includes(rec.qi))allRecs.push({...rec,ri:parseInt(ri)});});
+  });
+  const critRecs=allRecs.filter(r=>r.badge==='crit');
+  const essRecs=allRecs.filter(r=>r.badge==='crit'||r.badge==='high');
+  const essMin=essRecs.reduce((s,r)=>s+Math.round(r.baseMin*c.mult),0);
+  const essMax=essRecs.reduce((s,r)=>s+Math.round(r.baseMax*c.mult),0);
+  const costStr=allRecs.length===0?'< '+c.sym+'50':(c.sym+Math.round(essMin/10)*10+' – '+c.sym+Math.round(essMax/10)*10);
+  const completeMin=c.sym+Math.round(essMin*2.8/100)*100;
+  const completeMax=c.sym+Math.round(essMax*2.8/100)*100;
+  const today=new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  const mobLabel={independent:'Fully Independent',some:'Some Difficulty',aid:'Uses Walking Aid',assist:'Needs Assistance'}[mobility]||'—';
+  const condStr=conditions.filter(x=>x!=='None of the above').join(', ')||'no specific conditions selected';
+  const metaStr='Assessed by '+(relationship||'Family')+' · '+today+' · '+mobLabel+' · '+c.name;
+  const quickHtml=critRecs.slice(0,3).map(r=>`<div class="quick-item"><span>&#9989;</span><span style="flex:1">${r.title}</span><span class="quick-cost">${fmt(r.baseMin,r.baseMax)}</span></div>`).join('')||'<div class="quick-item"><span>&#9989;</span><span>No critical issues flagged — great work!</span></div>';
+  const persHtml='<strong>PERSONALIZED FOR:</strong> '+condStr+' — scoring weighted to prioritize risks relevant to '+elderName+"'s conditions.";
+
+  ['r-circle','r2-circle'].forEach(id=>{const el=document.getElementById(id);el.style.borderColor=circleColor;el.style.background=circleBg;});
+  ['r-score','r2-score'].forEach(id=>{document.getElementById(id).style.color=circleColor;document.getElementById(id).textContent=safePct;});
+  ['r-risk-lbl','r2-risk'].forEach(id=>{document.getElementById(id).style.color=circleColor;document.getElementById(id).textContent=riskLbl;});
+  document.getElementById('r-name').textContent=elderName+"'s Home Safety Report";
+  document.getElementById('r-meta').textContent=metaStr;
+  document.getElementById('r-crit').textContent=critRecs.length;
+  document.getElementById('r-recs').textContent=allRecs.length;
+  document.getElementById('r-cost').textContent=costStr;
+  document.getElementById('r-personal').innerHTML=persHtml;
+  document.getElementById('r-quick').innerHTML=quickHtml;
+  document.getElementById('pay-btn').textContent='Unlock Full Report — '+c.sym+'9';
+  document.getElementById('r2-name').textContent=elderName+"'s Home Safety Report";
+  document.getElementById('r2-meta').textContent=metaStr;
+  document.getElementById('r2-crit').textContent=critRecs.length;
+  document.getElementById('r2-recs').textContent=allRecs.length;
+  document.getElementById('r2-cost').textContent=costStr;
+  document.getElementById('r2-personal').innerHTML=persHtml;
+  document.getElementById('r2-quick').innerHTML=quickHtml;
+
+  let roomsHtml='';let qc=0;
+  ROOMS.forEach((rm,ri)=>{
+    const rqs=QUESTIONS.slice(qc,qc+rm.count);
+    const noInRoom=rqs.filter((_,j)=>answers[qc+j]==='no').length;
+    const ansInRoom=rqs.filter((_,j)=>answers[qc+j]==='yes'||answers[qc+j]==='no').length;
+    const pct=ansInRoom>0?Math.round(((ansInRoom-noInRoom)/ansInRoom)*100):100;
+    const barColor=pct<50?'#A32D2D':pct<75?'#854F0B':'#3B6D11';
+    const roomRecs=(BASE_RECS[ri]||[]).filter(r=>noIdx.includes(r.qi));
+    const recsHtml=roomRecs.length?roomRecs.map(r=>`
+      <div class="rec-card">
+        <span class="badge badge-${r.badge}">${r.badge==='crit'?'CRITICAL':r.badge==='high'?'HIGH PRIORITY':'RECOMMENDED'}</span>
+        <div class="rec-cost">${fmt(r.baseMin,r.baseMax)}</div>
+        <div class="rec-title">${r.title}</div>
+        <div class="rec-desc">${r.desc}</div>
+        <div class="rec-links">
+          <a class="rec-link" href="${c.storeUrl}${encodeURIComponent(r.search)}" target="_blank" rel="noopener">Shop ${c.store} &#8599;</a>
+          <a class="rec-link" href="https://www.amazon.com/s?k=${encodeURIComponent(r.search)}" target="_blank" rel="noopener">Shop Amazon &#8599;</a>
+        </div>
+      </div>`).join(''):'<div style="padding:6px 0;font-size:12px;font-family:sans-serif;color:#6b6b60">No issues flagged in this area — well done.</div>';
+    roomsHtml+=`<div class="room-card">
+      <div class="room-header">
+        <div class="room-header-left"><span>${rm.icon}</span><span>${rm.name}</span></div>
+        <div class="room-pct" style="color:${barColor}">${pct}%</div>
+      </div>
+      <div class="room-bar"><div class="room-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+      <div class="room-items">${recsHtml}</div>
+    </div>`;
+    qc+=rm.count;
+  });
+  document.getElementById('r2-rooms').innerHTML=roomsHtml;
+  document.getElementById('r2-invest').innerHTML=`
+    <div class="invest-card green"><div class="invest-lbl green">ESSENTIALS</div><div class="invest-val">${costStr}</div></div>
+    <div class="invest-card amber"><div class="invest-lbl amber">COMPLETE</div><div class="invest-val">${completeMin}–${completeMax}</div></div>`;
+  document.getElementById('cta-headline').textContent="Make "+elderName+"'s home safer — beautifully";
+  go('s4','s3');
+}
+
+function handlePay(){
+  // STEP 2: Replace this URL with your Lemon Squeezy checkout link
+  const PAYMENT_URL='https://your-store.lemonsqueezy.com/checkout/buy/YOUR-PRODUCT-ID';
+  window.open(PAYMENT_URL,'_blank');
+  // After payment, user returns here and sees full report:
+  // go('s5','s4');
+  // For now, demo the unlocked state directly:
+  go('s5','s4');
+}
+
+function restartApp(){
+  answers=new Array(28).fill(null);current=0;mobility='';
+  document.getElementById('elder-name').value='';
+  document.querySelectorAll('.pill,.mobility-card').forEach(el=>el.classList.remove('selected'));
+  go('s1','s5');
+}
+</script>
+</body>
+</html>
