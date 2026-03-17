@@ -128,6 +128,7 @@ h1{font-size:26px;font-weight:400;text-align:center;line-height:1.2}
 .cta-dark-btn{display:inline-block;padding:12px 28px;border:1.5px solid #fff;border-radius:8px;color:#fff;font-size:12px;letter-spacing:0.08em;font-family:sans-serif;cursor:pointer;background:transparent}
 .new-assess{width:100%;padding:13px;border:1.5px solid #2c2c2a;border-radius:8px;background:transparent;font-size:12px;letter-spacing:0.08em;font-family:sans-serif;cursor:pointer;margin-top:8px}
 .site-footer{text-align:center;font-size:11px;font-family:sans-serif;color:#b0b0a0;padding:2rem 0 1rem;border-top:0.5px solid #d8d4c8;margin-top:2rem}
+.legal-footer{margin-top:1.5rem;padding:12px 14px;background:#f0ede6;border-radius:8px;font-size:11px;font-family:sans-serif;color:#8b8b7a;line-height:1.6;border-left:3px solid #d8d4c8;}
 </style>
 </head>
 <body>
@@ -174,6 +175,9 @@ h1{font-size:26px;font-weight:400;text-align:center;line-height:1.2}
     <div class="pill pill-wide" onclick="togglePill(this,'stairs')">No</div>
   </div>
   <button class="cta-btn" onclick="goToS2()">CONTINUE →</button>
+  <div class="legal-footer" style="margin-top:1.5rem">
+    By continuing you acknowledge this tool is for informational purposes only and does not replace professional occupational therapy or medical advice.
+  </div>
 </div>
 
 <!-- S2: About elder -->
@@ -249,6 +253,9 @@ h1{font-size:26px;font-weight:400;text-align:center;line-height:1.2}
   </div>
   <button class="pay-btn" id="pay-btn" onclick="handlePay()">Unlock Full Report — $9</button>
   <div class="pay-note">One-time payment &nbsp;·&nbsp; Instant access &nbsp;·&nbsp; Printable PDF</div>
+  <div class="legal-footer">
+    <strong>Disclaimer:</strong> This assessment is for informational purposes only and does not constitute professional occupational therapy advice, medical advice, or a safety certification. Results are based on self-reported information and should not replace an in-person evaluation by a licensed occupational therapist or other qualified professional. HomeForLife accepts no liability for actions taken or not taken based on the results of this assessment.
+  </div>
 </div>
 
 <!-- S5: Unlocked -->
@@ -281,6 +288,9 @@ h1{font-size:26px;font-weight:400;text-align:center;line-height:1.2}
     <div class="cta-dark-btn" onclick="trackEvent('consultation_clicked',{country:country,free_mode:IS_FREE});window.open('mailto:hello@homeforlife.com','_blank')">BOOK A FREE CONSULTATION</div>
   </div>
   <button class="new-assess" onclick="restartApp()">START NEW ASSESSMENT</button>
+  <div class="legal-footer">
+    <strong>Disclaimer:</strong> This assessment is for informational purposes only and does not constitute professional occupational therapy advice, medical advice, or a safety certification. Results are based on self-reported information and should not replace an in-person evaluation by a licensed occupational therapist or other qualified professional. HomeForLife accepts no liability for actions taken or not taken based on the results of this assessment. If you have concerns about fall risk or home safety, please consult a qualified healthcare professional.
+  </div>
 </div>
 
 <div class="site-footer">
@@ -353,7 +363,7 @@ const ROOMS=[
   {name:'Entrance & Stairs',icon:'🚪',hint:'Stairway falls cause the most serious injuries — entrances set the tone for safety',count:6}
 ];
 const QUESTIONS=[
-  {room:0,q:'Are grab bars installed near the toilet?',hint:'Toilet transfers are the single highest-risk moment. A grab bar reduces fall risk by up to 40%.'},
+  {room:0,q:'Are grab bars installed near the toilet?',hint:'Toilet transfers are the single highest-risk moment for falls. A securely mounted grab bar provides the support needed to sit and stand safely.'},
   {room:0,q:'Are there grab bars or a sturdy handle in the shower or bathtub area?',hint:'Wet surfaces + standing with eyes closed while washing hair = peak fall risk.'},
   {room:0,q:'Is the shower or tub floor non-slip (textured tiles, anti-skid mat, or coating)?',hint:'A wet, smooth surface is the most common fall trigger. Anti-slip treatment is the #1 quick fix.'},
   {room:0,q:'Can they shower without stepping over a high ledge or into a tub?',hint:'Stepping over a bathtub edge or high threshold is a major fall trigger, especially post-surgery.'},
@@ -371,11 +381,11 @@ const QUESTIONS=[
   {room:2,q:'Are taps and handles easy to grip (lever-type, not round knobs)?',hint:'Round knobs require 5x more grip strength than lever handles — critical for arthritic hands.'},
   {room:2,q:'Is the countertop area well-lit for food preparation (no shadowy work zones)?',hint:'Poor task lighting leads to cuts, burns, and missed spills. Under-cabinet lighting solves this instantly.'},
   {room:3,q:function(){return'Are walkways at least '+COUNTRIES[country].meas+' wide and free of cords, clutter, and protruding furniture?'},hint:'Clear wide pathways let walkers and wheelchairs pass safely and reduce trip hazards dramatically.'},
-  {room:3,q:'Are all rugs removed or firmly secured with non-slip backing?',hint:'Loose rugs cause 38% of home trip-and-fall injuries. Best practice: remove them entirely.'},
+  {room:3,q:'Are all rugs removed or firmly secured with non-slip backing?',hint:'Loose rugs are among the most common causes of trip-and-fall injuries at home. Best practice: remove them entirely or secure with certified non-slip backing.'},
   {room:3,q:'Is there a firm, high-seated chair with armrests for easy sit-to-stand?',hint:'Low sofas without armrests are extremely difficult for seniors. A chair with armrests at the right height is ideal.'},
   {room:3,q:'Are floor transitions (tile to wood, room thresholds) smooth and level?',hint:'Even a small threshold lip is a trip hazard. Beveled transitions or threshold ramps eliminate this.'},
   {room:3,q:'Are light switches accessible at every room entrance?',hint:'Walking into dark rooms is a common fall trigger. Two-way switches or motion sensors solve this.'},
-  {room:4,q:'Are there sturdy handrails on both sides of all staircases?',hint:'Dual handrails reduce stair falls by up to 60%. Single-side is not enough for seniors with balance issues.'},
+  {room:4,q:'Are there sturdy handrails on both sides of all staircases?',hint:'Dual handrails give both hands something to grip when ascending or descending — significantly safer than single-side rails for seniors with balance issues.'},
   {room:4,q:'Are stair edges clearly visible (contrast strips, different-color nosing)?',hint:'Contrast nosing on step edges is mandatory in aged-care facilities globally. A simple, high-impact fix.'},
   {room:4,q:'Is stairway and corridor lighting bright, consistent, and glare-free?',hint:'Inconsistent lighting causes depth-perception errors. Warm 3000–3500K LEDs at high CRI are ideal.'},
   {room:4,q:'Can they enter and exit the home without navigating steps (or is there a ramp)?',hint:'A single step at the entrance becomes impassable after hip or knee surgery. Ramp slope must be gentle.'},
