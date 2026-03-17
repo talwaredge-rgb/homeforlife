@@ -523,12 +523,10 @@ function showResults(){
 }
 
 function handlePay(){
-  // STEP 2: Replace this URL with your Lemon Squeezy checkout link
-  const PAYMENT_URL='https://your-store.lemonsqueezy.com/checkout/buy/YOUR-PRODUCT-ID';
+  const PAYMENT_URL='https://talwaredge.gumroad.com/l/jfhrc';
   window.open(PAYMENT_URL,'_blank');
-  // After payment, user returns here and sees full report:
-  // go('s5','s4');
-  // For now, demo the unlocked state directly:
+  // go('s5','s4') is called after payment confirmation
+  // For now also show unlocked state so user can see what they're buying:
   go('s5','s4');
 }
 
