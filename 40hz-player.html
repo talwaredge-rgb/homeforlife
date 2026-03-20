@@ -5,7 +5,57 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>40 Hz Gamma Sound Therapy</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
-<!-- GA4: paste your snippet here once you have your property ID -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9DP3DWR1B2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9DP3DWR1B2');
+
+  // ── Session tracking ──────────────────────────────────────────────────────
+  var _sessionStart = null;
+  var _heartbeatInterval = null;
+  var _heartbeatCount = 0;
+
+  function gaEvent(name, params) {
+    if (typeof gtag !== 'undefined') gtag('event', name, params || {});
+  }
+
+  function gaSessionStart(scene, sessionMins) {
+    _sessionStart = Date.now();
+    _heartbeatCount = 0;
+    gaEvent('play_started', {
+      soundscape: scene,
+      session_preset: sessionMins === 0 ? 'open' : sessionMins + '_min'
+    });
+    // Fire every 5 min of active listening
+    _heartbeatInterval = setInterval(function() {
+      _heartbeatCount += 5;
+      gaEvent('listening_milestone', { minutes_listened: _heartbeatCount });
+    }, 5 * 60 * 1000);
+  }
+
+  function gaSessionEnd(reason) {
+    if (!_sessionStart) return;
+    clearInterval(_heartbeatInterval);
+    var secs = Math.round((Date.now() - _sessionStart) / 1000);
+    gaEvent('play_stopped', {
+      duration_seconds: secs,
+      duration_minutes: Math.round(secs / 60 * 10) / 10,
+      reason: reason
+    });
+    _sessionStart = null;
+  }
+
+  // Capture tab close / navigation away mid-session
+  window.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') gaSessionEnd('tab_hidden');
+  });
+  window.addEventListener('beforeunload', function() {
+    gaSessionEnd('page_unload');
+  });
+</script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #faf9f7; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; }
@@ -259,7 +309,7 @@ function selectScene(btn, type) {
   document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active'); currentScene = type;
   document.getElementById('mixRow').style.display = type === 'none' ? 'none' : 'flex';
-  if (playing && ctx) buildScene(type);
+  if (playing && ctx) { gaEvent('soundscape_changed', { soundscape: type }); buildScene(type); }
 }
 function setMix(val) {
   mixLevel = val / 100; document.getElementById('mixVal').textContent = val + '%';
@@ -283,6 +333,7 @@ function togglePlay() {
   if (!playing) {
     if (!ctx) initAudio(); else ctx.resume();
     buildScene(currentScene); playing = true;
+    gaSessionStart(currentScene, sessionOpen ? 0 : sessionDuration / 60);
     document.getElementById('playIcon').outerHTML = '<div id="playIcon" class="pause-icon"><div class="pause-bar"></div><div class="pause-bar"></div></div>';
     timerInterval = setInterval(() => {
       elapsed++; updateTimer();
@@ -293,6 +344,7 @@ function togglePlay() {
 }
 function stopPlay() {
   clearScene(); if (ctx) ctx.suspend(); playing = false;
+  gaSessionEnd('user_stopped');
   clearInterval(timerInterval);
   document.getElementById('playIcon').outerHTML = '<div id="playIcon" class="play-icon"></div>';
   cancelAnimationFrame(animFrame); clearCanvas();
